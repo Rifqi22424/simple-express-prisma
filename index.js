@@ -18,15 +18,15 @@ app.get("/", async (req, res) => {
 app.post("/", async (req, res) => {
   const { name, email } = req.body;
 
-  const userExists = await prisma.user.findUnique({
-    where: email,
-  });
-
-  if (userExists) {
-    return res.status(400).json({ error: "User already exists" });
-  }
-
   try {
+    const userExists = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (userExists) {
+      return res.status(400).json({ error: "User already exists" });
+    }
+
     const user = await prisma.user.create({
       data: {
         name,
@@ -34,8 +34,9 @@ app.post("/", async (req, res) => {
       },
     });
 
-    res.status(200).json({ message: "User created successfully", user });
+    res.status(201).json({ message: "User created successfully", user });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
@@ -61,7 +62,7 @@ app.put("/:id", async (req, res) => {
       },
     });
 
-    res.status(200).json({ message: "User updated successfully", updateUser });
+    res.status(202).json({ message: "User updated successfully", updateUser });
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }
@@ -80,7 +81,7 @@ app.delete("/:id", async (req, res) => {
     const deleteUser = await prisma.user.delete({
       where: { id },
     });
-    res.status(200).json({ message: "user berhasil dihapus!" });
+    res.status(202).json({ message: "user berhasil dihapus!" });
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }
